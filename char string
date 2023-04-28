@@ -1,0 +1,42 @@
+section .data
+    string db "Hello, world!", 0   ; null-terminated string
+    search_char db "l"             ; character to search for
+
+section .text
+    global _start
+
+_start:
+    ; Initialize variables
+    mov eax, 0      ; counter for occurrence of character
+    mov esi, string ; pointer to start of string
+    mov edi, search_char ; pointer to search character
+
+search_loop:
+    cmp byte [esi], 0   ; check if end of string
+    je done             ; if so, exit loop
+
+    cmp byte [esi], [edi]   ; compare current character with search character
+    je increment_counter    ; if equal, increment counter
+
+    ; move to next character in string and loop
+    inc esi
+    jmp search_loop
+
+increment_counter:
+    ; increment occurrence counter and move to next character in string
+    inc eax
+    inc esi
+    jmp search_loop
+
+done:
+    ; print occurrence count
+    mov eax, 4      ; system call for writing to stdout
+    mov ebx, 1      ; file descriptor for stdout
+    mov ecx, eax    ; pointer to string to print (in this case, the occurrence count)
+    mov edx, 1      ; length of string to print (1 byte for count)
+    int 0x80        ; make system call
+
+    ; exit program
+    mov eax, 1      ; system call for exiting program
+    xor ebx, ebx    ; exit status code (0 for success)
+    int 0x80        ; make system call
